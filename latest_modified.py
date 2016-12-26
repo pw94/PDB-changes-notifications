@@ -1,13 +1,13 @@
-import requests
+import urllib.request
 
 url = "http://www.rcsb.org/pdb/rest/search"
-request_body = """
+queryText = """
 <orgPdbQuery>
 <queryType>org.pdb.query.simple.ModifiedStructuresQuery</queryType>
 </orgPdbQuery>
 """
 
-r = requests.post(url, request_body)
+req = urllib.request.Request(url, data=queryText.encode())
+f = urllib.request.urlopen(req)
 
-print(r.status_code)
-print(r.text)
+print(f.read().decode())
