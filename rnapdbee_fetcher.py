@@ -29,7 +29,13 @@ def get_RNA_secondary_structure(pdbId):
     
     with ZipFile(tmp_filename,"r") as zip_ref:
         zip_ref.extractall(results_dir)
-    
     os.remove(tmp_filename)
     
-    return os.path.join(results_dir, os.listdir(results_dir)[0])
+    result_filename = os.path.join(results_dir, os.listdir(results_dir)[0])
+    result = ""
+    with open(result_filename, "r") as result_file:
+        result = result_file.read()
+    os.remove(result_filename)
+    os.rmdir(results_dir)
+
+    return result
