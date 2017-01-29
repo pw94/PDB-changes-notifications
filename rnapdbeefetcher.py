@@ -1,17 +1,50 @@
+from shutil import rmtree
+from time import sleep
 from requests import Session
 from robobrowser import RoboBrowser
 from zipfile import ZipFile
 import os
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+
+SECONDS_TO_DOWNLOAD_RESULT = 8
+
+
+def get_RNA_secondary_structure_via_browser(pdbId):
+    driver = webdriver.Chrome()
+    driver.get("http://rnapdbee.cs.put.poznan.pl/")
+    driver.find_element_by_id("pdbId").send_keys(pdbId)
+    get_button = driver.find_element_by_xpath("//div[@class='column2']/input[2]")
+    get_button.click()
+    element = WebDriverWait(driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "commitPdb")))
+    element.send_keys(Keys.RETURN)
+    WebDriverWait(driver, 30).until(expected_conditions.visibility_of_element_located((By.ID, "downloadResults")))
+    driver.find_element_by_class_name("isDotBracket").click()
+    driver.find_element_by_id("downloadAllTop").click()
+    download_directory = os.path.expanduser('~/Downloads')
+    sleep(SECONDS_TO_DOWNLOAD_RESULT)
+    driver.close()
+    files = [os.path.join(download_directory, file) for file in os.listdir(download_directory) if file.startswith("RNApdbee")]
+    newest_file = max(files, key=os.path.getctime)
+
+    results_dir = os.path.abspath("results")
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    return _get_result(results_dir, newest_file)
+
 
 def get_RNA_secondary_structure(pdbId):
     url = "http://rnapdbee.cs.put.poznan.pl/"
     session = Session()
-    response = session.post(url + "home/fetch", data={"pdbId":pdbId})
+    response = session.post(url + "home/fetch", data={"pdbId": pdbId})
     response.raise_for_status()
     browser = RoboBrowser(parser="html.parser", session=session)
     browser.open(url)
     form = browser.get_form(id="analysePdb")
-    datasource = browser.select("#datasourcePdb")
     form["content"].value = response.text
     form["source"].value = pdbId.upper() + ".pdb"
     browser.submit_form(form)
@@ -26,16 +59,36 @@ def get_RNA_secondary_structure(pdbId):
     tmp_filename = os.path.join(results_dir, "tmp.zip")
     with open(tmp_filename, "wb") as output:
         output.write(browser.response.content)
-    
-    with ZipFile(tmp_filename,"r") as zip_ref:
+
+    return _get_result(results_dir, tmp_filename)
+
+
+def _set_result_file(results_dir):
+    if len([file for file in os.listdir(results_dir)]) == 1:
+        intermediate_directory = os.path.join(results_dir, os.listdir(results_dir)[0])
+        if os.path.isdir(intermediate_directory):
+            while os.path.isdir(intermediate_directory):
+                intermediate_directory = os.path.join(intermediate_directory, os.listdir(intermediate_directory)[0])
+            result_filename = os.listdir(intermediate_directory)[0]
+            result_filename_abs = os.path.join(intermediate_directory, result_filename)
+            os.rename(result_filename_abs, os.path.join(intermediate_directory, result_filename))
+
+
+def _get_result(results_dir, tmp_filename):
+    with ZipFile(tmp_filename, "r") as zip_ref:
         zip_ref.extractall(results_dir)
     os.remove(tmp_filename)
-    
-    result_filename = os.path.join(results_dir, os.listdir(results_dir)[0])
+    result_filename = _get_result_file(results_dir)
     result = ""
     with open(result_filename, "r") as result_file:
         result = result_file.read()
-    os.remove(result_filename)
-    os.rmdir(results_dir)
-
+    rmtree(results_dir)
     return result
+
+
+def _get_result_file(results_dir):
+    result_file = os.path.join(results_dir, os.listdir(results_dir)[0])
+    while os.path.isdir(result_file):
+        results_dir = result_file
+        result_file = os.path.join(results_dir, os.listdir(results_dir)[0])
+    return result_file
