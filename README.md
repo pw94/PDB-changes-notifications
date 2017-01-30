@@ -1,3 +1,6 @@
-# Notyfikacje o zmianach w bazie PDB
-Program ma za zadanie monitorować cotygodniowe zmiany w bazie PDB (http://www.rcsb.org), w szczególności modyfikacje struktur już istniejących w bazie. W przypadku wykrycia zastąpienia struktury jej nową wersją, porównanie obu tych wersji, identyfikacja struktury drugorzędowej programem RNA PDBee (http://rnapdbee.cs.put.poznan.pl/) i stworzenie raportu w przypadku gdy obie wersje generują różne wyniki.
-Drugą funkcjonalnością jest możliwość przejrzenia całej bazy i identyfikacja wszystkich par różniących się struktur.
+# Notifications about changes in PDB
+The task of the program is to monitor weekly changes in PDB (http://www.rcsb.org), mainly modifications of the structures already presented in the database. In case of the detection of the replacing structure with the new version, the program compares both versions, identifies the secondary structure by RNA PRBee (http://rnapdbee.cs.put.poznan.pl/) and generate report.  
+The second function is look through entire database and identification of the distinguishing structures.
+
+### Requirements:
+To run program you need [Python 3](https://www.python.org), packages listed in [requirements.txt](https://github.com/pw94/PDB-changes-notifications/blob/master/requirements.txt), [Chrome Web Browser](https://www.google.com/chrome/) and [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads).
