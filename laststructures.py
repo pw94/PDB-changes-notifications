@@ -3,6 +3,10 @@ from bs4 import BeautifulSoup
 
 
 def get_last_load_query():
+    """
+    Get recently added structures to PDB
+    :return: List of recently added structures to PDB
+    """
     url = "http://www.rcsb.org/pdb/rest/search"
     queryText = """
     <orgPdbQuery>
@@ -16,6 +20,10 @@ def get_last_load_query():
 
 
 def get_obsoletes():
+    """
+    Get the list of obsoletes structures in PDB
+    :return: List of obsoletes structures
+    """
     url = "http://www.rcsb.org/pdb/rest/getObsolete"
     soup = BeautifulSoup(urlopen(Request(url)).read(), "xml")
     pdbs = soup.find_all("PDB", attrs={"structureId": True})

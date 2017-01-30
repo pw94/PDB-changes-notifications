@@ -13,6 +13,11 @@ SECONDS_TO_FILL_OUT_FORM = 30
 
 
 def get_RNA_secondary_structure_via_browser(pdbId):
+    """
+    Get RNA secondary structure for structure from PDB in Dot-Bracket Notation
+    :param pdbId: ID of structure in PDB
+    :return: RNA secondary structure in Dot-Bracket Notation
+    """
     driver = webdriver.Chrome()
     driver.get("http://rnapdbee.cs.put.poznan.pl/")
     driver.find_element_by_id("pdbId").send_keys(pdbId)
@@ -37,6 +42,12 @@ def get_RNA_secondary_structure_via_browser(pdbId):
 
 
 def _get_result(results_dir, tmp_filename):
+    """
+    Get result from downloaded zip file
+    :param results_dir: Directory with results
+    :param tmp_filename: Temporary downloaded zip file
+    :return: Content of result file
+    """
     with ZipFile(tmp_filename, "r") as zip_ref:
         zip_ref.extractall(results_dir)
     os.remove(tmp_filename)
@@ -49,6 +60,11 @@ def _get_result(results_dir, tmp_filename):
 
 
 def _get_result_file(results_dir):
+    """
+    Find filename of file with result from downloaded files
+    :param results_dir: Directory with results
+    :return: Filename of file with result
+    """
     result_file = os.path.join(results_dir, os.listdir(results_dir)[0])
     while os.path.isdir(result_file):
         results_dir = result_file
