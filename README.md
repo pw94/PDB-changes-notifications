@@ -11,6 +11,7 @@ To run a program you only have to type:
 ```python main.py```
 
 There is plenty of available options which you can pass to access other modes. You can list all of them by typing:
+ 
  ```python main.py --help```
  
  Output:
