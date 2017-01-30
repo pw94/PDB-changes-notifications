@@ -8,12 +8,12 @@ def get_obsoletes_for(structures):
         obsolete = get_obsolete(structure)
         if obsolete is not None:
             pairs.append((obsolete, structure))
-    
+
     return pairs
 
 
 def get_obsolete(id):
-    r = requests.get("http://www.rcsb.org/pdb/rest/idStatus", params={ "structureId" : id })
+    r = requests.get("http://www.rcsb.org/pdb/rest/idStatus", params={"structureId": id})
     soup = BeautifulSoup(r.text, "xml")
     return soup.find("record").get("replaces")
 
@@ -24,11 +24,11 @@ def get_supersedings_for(structures):
         superseding = get_obsolete(structure)
         if superseding is not None:
             pairs.append((structure, superseding))
-    
+
     return pairs
 
 
 def get_superseding(id):
-    r = requests.get("http://www.rcsb.org/pdb/rest/idStatus", params={ "structureId" : id })
+    r = requests.get("http://www.rcsb.org/pdb/rest/idStatus", params={"structureId": id})
     soup = BeautifulSoup(r.text, "xml")
     return soup.find("record").get("replacedBy")
