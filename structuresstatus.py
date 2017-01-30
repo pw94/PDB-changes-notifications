@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
+
 def get_obsoletes_for(structures):
     pairs = []
     for structure in structures:

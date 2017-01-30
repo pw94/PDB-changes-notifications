@@ -1,7 +1,5 @@
 from shutil import rmtree
 from time import sleep
-from requests import Session
-from robobrowser import RoboBrowser
 from zipfile import ZipFile
 import os
 from selenium import webdriver
@@ -36,32 +34,6 @@ def get_RNA_secondary_structure_via_browser(pdbId):
         os.makedirs(results_dir)
 
     return _get_result(results_dir, newest_file)
-
-
-def get_RNA_secondary_structure(pdbId):
-    url = "http://rnapdbee.cs.put.poznan.pl/"
-    session = Session()
-    response = session.post(url + "home/fetch", data={"pdbId": pdbId})
-    response.raise_for_status()
-    browser = RoboBrowser(parser="html.parser", session=session)
-    browser.open(url)
-    form = browser.get_form(id="analysePdb")
-    form["content"].value = response.text
-    form["source"].value = pdbId.upper() + ".pdb"
-    browser.submit_form(form)
-    
-    form = browser.get_form(id="downloadResults")
-    form["isDotBracket"].value = "on"
-    browser.submit_form(form)
-    
-    results_dir = os.path.abspath("results")
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-    tmp_filename = os.path.join(results_dir, "tmp.zip")
-    with open(tmp_filename, "wb") as output:
-        output.write(browser.response.content)
-
-    return _get_result(results_dir, tmp_filename)
 
 
 def _get_result(results_dir, tmp_filename):
