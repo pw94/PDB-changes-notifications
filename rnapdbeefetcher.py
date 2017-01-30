@@ -10,7 +10,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-SECONDS_TO_DOWNLOAD_RESULT = 8
+SECONDS_TO_DOWNLOAD_RESULT = 10
+SECONDS_TO_FILL_OUT_FORM = 30
 
 
 def get_RNA_secondary_structure_via_browser(pdbId):
@@ -19,15 +20,15 @@ def get_RNA_secondary_structure_via_browser(pdbId):
     driver.find_element_by_id("pdbId").send_keys(pdbId)
     get_button = driver.find_element_by_xpath("//div[@class='column2']/input[2]")
     get_button.click()
-    element = WebDriverWait(driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "commitPdb")))
+    element = WebDriverWait(driver, SECONDS_TO_FILL_OUT_FORM).until(expected_conditions.element_to_be_clickable((By.ID, "commitPdb")))
     element.send_keys(Keys.RETURN)
-    WebDriverWait(driver, 30).until(expected_conditions.visibility_of_element_located((By.ID, "downloadResults")))
+    WebDriverWait(driver, SECONDS_TO_FILL_OUT_FORM).until(expected_conditions.visibility_of_element_located((By.ID, "downloadResults")))
     driver.find_element_by_class_name("isDotBracket").click()
     driver.find_element_by_id("downloadAllTop").click()
     download_directory = os.path.expanduser('~/Downloads')
     sleep(SECONDS_TO_DOWNLOAD_RESULT)
     driver.close()
-    files = [os.path.join(download_directory, file) for file in os.listdir(download_directory) if file.startswith("RNApdbee")]
+    files = [os.path.join(download_directory, file) for file in os.listdir(download_directory) if file.startswith("RNApdbee") and file.endswith(".zip")]
     newest_file = max(files, key=os.path.getctime)
 
     results_dir = os.path.abspath("results")
@@ -61,17 +62,6 @@ def get_RNA_secondary_structure(pdbId):
         output.write(browser.response.content)
 
     return _get_result(results_dir, tmp_filename)
-
-
-def _set_result_file(results_dir):
-    if len([file for file in os.listdir(results_dir)]) == 1:
-        intermediate_directory = os.path.join(results_dir, os.listdir(results_dir)[0])
-        if os.path.isdir(intermediate_directory):
-            while os.path.isdir(intermediate_directory):
-                intermediate_directory = os.path.join(intermediate_directory, os.listdir(intermediate_directory)[0])
-            result_filename = os.listdir(intermediate_directory)[0]
-            result_filename_abs = os.path.join(intermediate_directory, result_filename)
-            os.rename(result_filename_abs, os.path.join(intermediate_directory, result_filename))
 
 
 def _get_result(results_dir, tmp_filename):
