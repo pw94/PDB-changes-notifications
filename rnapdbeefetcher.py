@@ -10,7 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-SECONDS_TO_DOWNLOAD_RESULT = 10
+SECONDS_TO_DOWNLOAD_RESULT = 5
 SECONDS_TO_FILL_OUT_FORM = 30
 
 
