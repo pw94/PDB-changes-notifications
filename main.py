@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 from laststructures import get_last_load_query, get_obsoletes
-from structuresstatus import get_obsoletes_for, get_supersedings_for
+from report import print_detailed_report
 from rna import contains_RNA_chains
+from structuresstatus import get_obsoletes_for, get_supersedings_for
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -18,3 +19,9 @@ if __name__ == '__main__':
         structures_pairs = get_supersedings_for(obsoletes)
     
     structures_pairs = [(obsolete, superseding) for obsolete, superseding in structures_pairs if contains_RNA_chains(obsolete) and contains_RNA_chains(superseding)]
+
+    if len(structures_pairs) == 0:
+        print("There are no superseded structures which contains RNA chains")
+        quit()
+    
+    print_detailed_report(structures_pairs)
